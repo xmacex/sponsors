@@ -1,10 +1,10 @@
 {
-	"author": "Mace Ojala",
-	"email": "mace.ojala@rub.de",
-	"website": "https://plugins.bludit.com",
-	"version": "0.1.0",
-	"releaseDate": "2025-11-02",
-	"license": "GNU GPL",
-	"compatible": "3.16.2",
-	"notes": ""
+  "author": "Mace Ojala",
+  "email": "mace.ojala@gmail.com",
+  "website": "https://stsing.org/before-ruins",
+  "version": "0.1.0",
+  "releaseDate": "2025-11-02",
+  "license": "GNU GPL",
+  "compatible": "3.16.2",
+  "notes": ""
 }
