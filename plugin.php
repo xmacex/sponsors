@@ -44,9 +44,8 @@ class pluginSponsors extends Plugin
 		// 	$html .= '</div>';
 		// }
 
-		// return $html;
-
-        return "Helau this is sponsors plugin speaking. Currently no admin interface, talk with Mace please.";
+        $html = "Hallo 👋 This is <em>Sponsors</em> plugin speaking. Currently no admin interface, talk with Mace please.";
+		return $html;
 	}
 
 	// Method called on the sidebar of the website
@@ -126,7 +125,6 @@ class pluginSponsors extends Plugin
 	// }
 
     public function siteBodyEnd()
-    // public function pageEnd()
     {
         $html = "";
         $html .= "<footer class='sponsors footer bg-white'>";
