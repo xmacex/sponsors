@@ -7,7 +7,12 @@ class pluginSponsors extends Plugin
     public function init()
     {
         $jsondb = json_encode(array(
-            'RUSTlab' => 'https://rustlab.rub.de'
+            'RUSTlab' => array(
+                'prefix' => 'The',
+                'name'   => 'RUSTlab',
+                'url'    => 'https://rustlab.rub.de',
+                'suffix' => 'at RUB'
+            )
         ));
         $this->dbFields = array(
             'jsondb' => $jsondb
@@ -33,12 +38,19 @@ class pluginSponsors extends Plugin
             unset($sponsors[$name]);
         } elseif (isset($_POST['addSponsor'])) {
             $name = $_POST['sponsorName'];
-            $url  = $_POST['sponsorURL'];
+
+            $data = array(
+                'prefix' => $_POST['sponsorPrefix'],
+                'name'   => $_POST['sponsorName'],
+                'url'    => $_POST['sponsorURL'],
+                'suffix' => $_POST['sponsorSuffix'],
+            );
+
             if (empty($name)) {
                 return false;
             }
 
-            $sponsors[$name] = $url;
+            $sponsors[$name] = $data;
         }
 
         $this->db['jsondb'] = Sanitize::html(json_encode($sponsors));
@@ -60,6 +72,11 @@ class pluginSponsors extends Plugin
         $html .= '<h4 class="mt-3">' . $L->get('Add a new sponsor') . '</h4>';
 
         $html .= '<div>';
+        $html .= '<label>' . $L->get('Prefix') . '</label>';
+        $html .= '<input name="sponsorPrefix" type="text" dir="auto" class="form-control" value="" placeholder="e.g. The">';
+        $html .= '</div>';
+
+        $html .= '<div>';
         $html .= '<label>' . $L->get('Name') . '</label>';
         $html .= '<input name="sponsorName" type="text" dir="auto" class="form-control" value="" placeholder="e.g. RUSTlab">';
         $html .= '</div>';
@@ -70,6 +87,12 @@ class pluginSponsors extends Plugin
         $html .= '</div>';
 
         $html .= '<div>';
+        $html .= '<label>' . $L->get('Suffix') . '</label>';
+        $html .= '<input name="sponsorSuffix" type="text" dir="auto" class="form-control" value="" placeholder="e.g. community">';
+        $html .= '</div>';
+
+
+        $html .= '<div>';
         $html .= '<button name="addSponsor" class="btn btn-primary my-2" type="submit">' . $L->get('Add') . '</button>';
         $html .= '</div>';
 
@@ -77,21 +100,35 @@ class pluginSponsors extends Plugin
         $jsondb   = $this->getValue('jsondb', $unsanitized = false);
         $sponsors = json_decode($jsondb, true);
 
+        // var_dump($sponsors);
+
         $html .= !empty($sponsors) ? '<h4 class="mt-3">' . $L->get('Sponsors') . '</h4>' : '';
 
-        foreach ($sponsors as $name => $url) {
+        foreach ($sponsors as $sponsor) {
             $html .= '<div class="my-2">';
+
+            $html .= '<div>';
+            $html .= '<label>' . $L->get('Prefix') . '</label>';
+            $html .= '<input type="text" dir="auto" class="form-control" value="' . $sponsor['prefix'] . '" disabled>';
+            $html .= '</div>';
+
+
             $html .= '<label>' . $L->get('Name') . '</label>';
-            $html .= '<input type="text" class="form-control" value="' . $name . '" disabled">';
+            $html .= '<input type="text" class="form-control" value="' . $sponsor['name'] . '" disabled">';
             $html .= '</div>';
 
             $html .= '<div>';
             $html .= '<label>' . $L->get('Url') . '</label>';
-            $html .= '<input type="text" dir="auto" class="form-control" value="' . $url . '" disabled>';
+            $html .= '<input type="text" dir="auto" class="form-control" value="' . $sponsor['url'] . '" disabled>';
             $html .= '</div>';
 
             $html .= '<div>';
-            $html .= '<button name="deleteSponsor" class="btn btn-secondary my-2" type="submit" value="' . $name . '">' . $L->get('Delete') . '</button>';
+            $html .= '<label>' . $L->get('Suffix') . '</label>';
+            $html .= '<input type="text" dir="auto" class="form-control" value="' . $sponsor['suffix'] . '" disabled>';
+            $html .= '</div>';
+
+            $html .= '<div>';
+            $html .= '<button name="deleteSponsor" class="btn btn-secondary my-2" type="submit" value="' . $sponsor['name'] . '">' . $L->get('Delete') . '</button>';
             $html .= '</div>';
         };
 
@@ -103,25 +140,36 @@ class pluginSponsors extends Plugin
         $html  = '';
         $html .= "<footer class='sponsors footer bg-white'>";
         $html .= "<div class='container'>";
-        $html .= "<p>Sponsored by</p>";
+        $html .= "<h5>Sponsored by</h5>";
         $html .= "<div class='sponsor-list container align-items-center'>";
         $html .= "<ul>";
 
         $jsondb   = $this->getValue('jsondb', false);
         $sponsors = json_decode($jsondb);
 
-        foreach ($sponsors as $name => $url) {
-            $html .= '<li class="sponsor">';
-            $html .= '<a href="' . $url . ' target=_blank">';
-            $html .= $name;
-            $html .= '</a>';
-            $html .= '</li>';
+        foreach ($sponsors as $sponsor) {
+            $html .= $this->sponsorAsHtml($sponsor);
         }
 
         $html .= "</ul>";
         $html .= "</div>";
+        $html .= "</div>";
         $html .= "</footer>";
 
         return $html;
+    }
+
+    public function sponsorAsHtml($sponsor)
+    {
+        $elem  = '';
+        $elem .= '<li class="sponsor">';
+        $elem .= $sponsor->prefix . ' ';
+        $elem .= '<a href="' . $sponsor->url . '" target="_blank">';
+        $elem .= $sponsor->name;
+        $elem .= '</a>';
+        $elem .= ' ' . $sponsor->suffix;
+        $elem .= '</li>';
+
+        return $elem;
     }
 }
