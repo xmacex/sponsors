@@ -57,7 +57,7 @@ class pluginSponsors extends Plugin
         $html .= '</div>';
 
         $html .= '<div class="alert alert-danger" role="alert">';
-        $html .= "Hallo 👋 This is <em>Sponsors</em> plugin speaking. Currently no functional admin interface, talk with Mace please.";
+        $html .= "Hallo 👋 This is <em>Sponsors</em> plugin speaking. The admin UI feels a bit fragile and limited, but seems to get the job done. Talk with Mace please if there is something.";
         $html .= '</div>';
 
         // New sponsors
