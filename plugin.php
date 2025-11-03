@@ -1,144 +1,131 @@
 <?php
 
+// Copying the functionaliry of the `Links` plugin.
+
 class pluginSponsors extends Plugin
 {
-
 	public function init()
 	{
-		// Fields and default values for the database of this plugin
-		// $this->dbFields = array(
-		// 	'label' => 'Navigation',
-		// 	'homeLink' => true,
-		// 	'numberOfItems' => 5
-		// );
+        $jsondb = json_encode(array(
+            'RUSTlab' => 'https://rustlab.rub.de'
+        ));
+        $this->dbFields = array(
+            'label' => "Sponsors",
+            'jsondb' => $jsondb
+        );
+
+        // Disable default Save and Cancel button.
+        $this->formButtons = false;
 	}
+
+    // Method called when a POST request is sent
+    public function post()
+    {
+        // Get current jsondb value from database
+        $jsondb = $this->db['jsondb'];
+        $jsondb = Sanitize::htmlDecode($jsondb);
+
+        // Convert JSON to Array
+        $sponsors = json_decode($jsondb, true);
+
+        // Check if the user click on the delete or add
+        if (isset($_POST['deleteSponsor'])) {
+            $name = $_POST['deleteSponsor'];
+            unset($sponsors[$name]);
+        } elseif (isset($_POST['addSponsor'])) {
+            $name = $_POST['sponsorName'];
+            $url  = $_POST['sponsorURL'];
+            if (empty($name)) {
+                return false;
+            }
+
+            $sponsors[$name] = $url;
+        }
+
+        $this->db['jsondb'] = Sanitize::html(json_encode($sponsors));
+
+        return $this->save();
+    }
 
 	// Method called on the settings of the plugin on the admin area
 	public function form()
 	{
-		// global $L;
+        global $L;
 
-		// $html  = '<div class="alert alert-primary" role="alert">';
-		// $html .= $this->description();
-		// $html .= '</div>';
+        $html  = '<div class="alert alert-primary" role="alert">';
+        $html .= $this->description();
+        $html .= '</div>';
 
-		// $html .= '<div>';
-		// $html .= '<label>' . $L->get('Label') . '</label>';
-		// $html .= '<input id="jslabel" name="label" type="text" dir="auto" value="' . $this->getValue('label') . '">';
-		// $html .= '<span class="tip">' . $L->get('This title is almost always used in the sidebar of the site') . '</span>';
-		// $html .= '</div>';
+        $html .= '<div class="alert alert-danger" role="alert">';
+        $html .= "Hallo 👋 This is <em>Sponsors</em> plugin speaking. Currently no functional admin interface, talk with Mace please.";
+        $html .= '</div>';
 
-		// $html .= '<div>';
-		// $html .= '<label>' . $L->get('Home link') . '</label>';
-		// $html .= '<select name="homeLink">';
-		// $html .= '<option value="true" ' . ($this->getValue('homeLink') === true ? 'selected' : '') . '>' . $L->get('Enabled') . '</option>';
-		// $html .= '<option value="false" ' . ($this->getValue('homeLink') === false ? 'selected' : '') . '>' . $L->get('Disabled') . '</option>';
-		// $html .= '</select>';
-		// $html .= '<span class="tip">' . $L->get('Show the home link on the sidebar') . '</span>';
-		// $html .= '</div>';
+        // New sponsors
+		$html .= '<h4 class="mt-3">' . $L->get('Add a new sponsor') . '</h4>';
 
-		// if (ORDER_BY == 'date') {
-		// 	$html .= '<div>';
-		// 	$html .= '<label>' . $L->get('Amount of items') . '</label>';
-		// 	$html .= '<input id="jsnumberOfItems" name="numberOfItems" type="text" dir="auto" value="' . $this->getValue('numberOfItems') . '">';
-		// 	$html .= '</div>';
-		// }
+		$html .= '<div>';
+		$html .= '<label>' . $L->get('Name') . '</label>';
+		$html .= '<input name="sponsorName" type="text" dir="auto" class="form-control" value="" placeholder="RUSTlab">';
+		$html .= '</div>';
 
-        $html = "Hallo 👋 This is <em>Sponsors</em> plugin speaking. Currently no admin interface, talk with Mace please.";
+		$html .= '<div>';
+		$html .= '<label>' . $L->get('Url') . '</label>';
+		$html .= '<input name="sponsorURL" type="text" dir="auto" class="form-control" value="" placeholder="https://rustlab.rub.de/">';
+		$html .= '</div>';
+
+		$html .= '<div>';
+		$html .= '<button name="addSponsor" class="btn btn-primary my-2" type="submit">' . $L->get('Add') . '</button>';
+		$html .= '</div>';
+
+        // List stored sponsors.
+        $jsondb   = $this->getValue('jsondb', $unsanitized = false);
+        $sponsors = json_decode($jsondb, true);
+
+        $html .= !empty($sponsors) ? '<h4 class="mt-3">' . $L->get('Sponsors') . '</h4>' : '';
+
+        foreach ($sponsors as $name => $url) {
+            $html .= '<div class="my-2">';
+            $html .= '<label>' . $L->get('Name') . '</label>';
+            $html .= '<input type="text" class="form-control" value="' . $name . '" disabled">';
+            $html .= '</div>';
+
+            $html .= '<div>';
+			$html .= '<label>' . $L->get('Url') . '</label>';
+			$html .= '<input type="text" dir="auto" class="form-control" value="' . $url . '" disabled>';
+			$html .= '</div>';
+
+			$html .= '<div>';
+			$html .= '<button name="deleteSponsor" class="btn btn-secondary my-2" type="submit" value="' . $name . '">' . $L->get('Delete') . '</button>';
+			$html .= '</div>';
+        };
+
 		return $html;
 	}
 
-	// Method called on the sidebar of the website
-	// public function siteSidebar()
-	// {
-	// 	global $L;
-	// 	global $url;
-	// 	global $site;
-	// 	global $pages;
-
-	// 	// HTML for sidebar
-	// 	$html  = '<div class="plugin plugin-navigation">';
-
-	// 	// Print the label if not empty
-	// 	$label = $this->getValue('label');
-	// 	if (!empty($label)) {
-	// 		$html .= '<h2 class="plugin-label">' . $label . '</h2>';
-	// 	}
-
-	// 	$html .= '<div class="plugin-content">';
-	// 	$html .= '<ul>';
-
-	// 	// Show Home page link
-	// 	if ($this->getValue('homeLink')) {
-	// 		$html .= '<li>';
-	// 		$html .= '<a href="' . $site->url() . '">' . $L->get('Home page') . '</a>';
-	// 		$html .= '</li>';
-	// 	}
-
-	// 	// Pages order by position
-	// 	if (ORDER_BY == 'position') {
-	// 		// Get parents
-	// 		$parents = buildParentPages();
-	// 		foreach ($parents as $parent) {
-	// 			$html .= '<li class="parent">';
-	// 			$html .= '<a href="' . $parent->permalink() . '">' . $parent->title() . '</a>';
-
-	// 			if ($parent->hasChildren()) {
-	// 				// Get children
-	// 				$children = $parent->children();
-	// 				$html .= '<ul class="child">';
-	// 				foreach ($children as $child) {
-	// 					$html .= '<li class="child">';
-	// 					$html .= '<a class="child" href="' . $child->permalink() . '">' . $child->title() . '</a>';
-	// 					$html .= '</li>';
-	// 				}
-	// 				$html .= '</ul>';
-	// 			}
-	// 			$html .= '</li>';
-	// 		}
-	// 	}
-	// 	// Pages order by date
-	// 	else {
-	// 		// List of published pages
-	// 		$onlyPublished = true;
-	// 		$pageNumber = 1;
-	// 		$numberOfItems = $this->getValue('numberOfItems');
-	// 		$publishedPages = $pages->getList($pageNumber, $numberOfItems, $onlyPublished);
-
-	// 		foreach ($publishedPages as $pageKey) {
-	// 			try {
-	// 				$page = new Page($pageKey);
-	// 				$html .= '<li>';
-	// 				$html .= '<a href="' . $page->permalink() . '">' . $page->title() . '</a>';
-	// 				$html .= '</li>';
-	// 			} catch (Exception $e) {
-	// 				// Continue
-	// 			}
-	// 		}
-	// 	}
-
-	// 	$html .= '</ul>';
-	// 	$html .= '</div>';
-	// 	$html .= '</div>';
-
-	// 	return $html;
-	// }
-
     public function siteBodyEnd()
     {
-        $html = "";
+        $html  = '';
         $html .= "<footer class='sponsors footer bg-white'>";
         $html .= "<div class='container'>";
         $html .= "<p>Sponsored by</p>";
         $html .= "<div class='sponsor-list container align-items-center'>";
         $html .= "<ul>";
-        $html .= "<li class='sponsor'>Leibniz-Wissenschaftscampus <a href='https://reform.ressourcencampus-bochum.de/' target='_blank'>Resources in Transformation (ReFORM)</a></li>";
-        $html .= "<li class='sponsor'>Collaborative Research Centre 1567 <a href='https://virtuelle-lebenswelten.de' target='_blank'>Virtuelle Lebenswelten</a>";
-        $html .= "<li class='sponsor'>Chair of <a href='https://www.sowi.ruhr-uni-bochum.de/cupak/' target='_blank'>Cultural Psychology and Anthropology of Knowledge</a>' at Ruhr-University Bochum</li>";
-        $html .= "<li class='sponsor'><a href='https://rustlab.rub.de' target='_blank'>RUSTlab</a>";
+
+        $jsondb   = $this->getValue('jsondb', false);
+        $sponsors = json_decode($jsondb);
+
+        foreach ($sponsors as $name => $url) {
+            $html .= '<li class="sponsor">';
+            $html .= '<a href="' . $url . ' target=_blank">';
+            $html .= $name;
+            $html .= '</a>';
+            $html .= '</li>';
+        }
+
         $html .= "</ul>";
         $html .= "</div>";
         $html .= "</footer>";
+
         return $html;
     }
 }
