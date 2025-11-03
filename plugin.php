@@ -10,7 +10,6 @@ class pluginSponsors extends Plugin
             'RUSTlab' => 'https://rustlab.rub.de'
         ));
         $this->dbFields = array(
-            'label' => "Sponsors",
             'jsondb' => $jsondb
         );
 
@@ -52,12 +51,9 @@ class pluginSponsors extends Plugin
 	{
         global $L;
 
-        $html  = '<div class="alert alert-primary" role="alert">';
-        $html .= $this->description();
-        $html .= '</div>';
-
         $html .= '<div class="alert alert-danger" role="alert">';
-        $html .= "Hallo 👋 This is <em>Sponsors</em> plugin speaking. The admin UI feels a bit fragile and limited, but seems to get the job done. Talk with Mace please if there is something.";
+        $html .= "<p>Hallo 👋 This is " . "<em>" . $this->name() . "</em>" . " plugin speaking. The admin UI feels a bit fragile and limited, but seems to get the job done.</p>";
+        $html .= "<p>Please talk with Mace if there is something.</p>.";
         $html .= '</div>';
 
         // New sponsors
@@ -65,12 +61,12 @@ class pluginSponsors extends Plugin
 
 		$html .= '<div>';
 		$html .= '<label>' . $L->get('Name') . '</label>';
-		$html .= '<input name="sponsorName" type="text" dir="auto" class="form-control" value="" placeholder="RUSTlab">';
+		$html .= '<input name="sponsorName" type="text" dir="auto" class="form-control" value="" placeholder="e.g. RUSTlab">';
 		$html .= '</div>';
 
 		$html .= '<div>';
 		$html .= '<label>' . $L->get('Url') . '</label>';
-		$html .= '<input name="sponsorURL" type="text" dir="auto" class="form-control" value="" placeholder="https://rustlab.rub.de/">';
+		$html .= '<input name="sponsorURL" type="text" dir="auto" class="form-control" value="" placeholder="e.g. https://rustlab.rub.de/">';
 		$html .= '</div>';
 
 		$html .= '<div>';
