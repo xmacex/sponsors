@@ -152,8 +152,8 @@ class pluginSponsors extends Plugin
         $html .= "<footer class='sponsors footer'>";
         $html .= "<div class='container'>";
         $html .= "<h5>Sponsored by</h5>";
-        $html .= "<div class='sponsor-list container align-items-center'>";
-        $html .= "<ul>";
+        $html .= "<div class='sponsor-list'>";
+        $html .= "<ul class='list-unstyled'>";
 
         $jsondb   = $this->getValue('jsondb', false);
         $sponsors = json_decode($jsondb);
