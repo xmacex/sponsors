@@ -8,10 +8,11 @@ class pluginSponsors extends Plugin
     {
         $jsondb = json_encode(array(
             'RUSTlab' => array(
-                'prefix' => 'The',
-                'name'   => 'RUSTlab',
-                'url'    => 'https://rustlab.rub.de',
-                'suffix' => 'at RUB'
+                'prefix'  => 'The',
+                'name'    => 'RUSTlab',
+                'url'     => 'https://rustlab.rub.de',
+                'suffix'  => 'at RUB',
+                'logourl' => 'https://rustlab.ruhr-uni-bochum.de/wp-content/uploads/2023/02/logo-tentacle-500x500-1-1-200x200.png'
             )
         ));
         $this->dbFields = array(
@@ -40,10 +41,11 @@ class pluginSponsors extends Plugin
             $name = $_POST['sponsorName'];
 
             $data = array(
-                'prefix' => $_POST['sponsorPrefix'],
-                'name'   => $_POST['sponsorName'],
-                'url'    => $_POST['sponsorURL'],
-                'suffix' => $_POST['sponsorSuffix'],
+                'prefix'  => $_POST['sponsorPrefix'],
+                'name'    => $_POST['sponsorName'],
+                'url'     => $_POST['sponsorURL'],
+                'suffix'  => $_POST['sponsorSuffix'],
+                'logourl' => $_POST['sponsorLogoURL']
             );
 
             if (empty($name)) {
@@ -91,6 +93,10 @@ class pluginSponsors extends Plugin
         $html .= '<input name="sponsorSuffix" type="text" dir="auto" class="form-control" value="" placeholder="e.g. community">';
         $html .= '</div>';
 
+        $html .= '<div>';
+        $html .= '<label>' . $L->get('Logo URL') . '</label>';
+        $html .= '<input name="sponsorLogoURL" type="text" dir="auto" class="form-control" value="" placeholder="e.g. https://rustlab.ruhr-uni-bochum.de/wp-content/uploads/2023/02/logo-tentacle-500x500-1-1-200x200.png">';
+        $html .= '</div>';
 
         $html .= '<div>';
         $html .= '<button name="addSponsor" class="btn btn-primary my-2" type="submit">' . $L->get('Add') . '</button>';
@@ -128,6 +134,11 @@ class pluginSponsors extends Plugin
             $html .= '</div>';
 
             $html .= '<div>';
+            $html .= '<label>' . $L->get('Logo URL') . '</label>';
+            $html .= '<input type="text" dir="auto" class="form-control" value="' . $sponsor['logourl'] . '" disabled>';
+            $html .= '</div>';
+
+            $html .= '<div>';
             $html .= '<button name="deleteSponsor" class="btn btn-secondary my-2" type="submit" value="' . $sponsor['name'] . '">' . $L->get('Delete') . '</button>';
             $html .= '</div>';
         };
@@ -138,7 +149,7 @@ class pluginSponsors extends Plugin
     public function siteBodyEnd()
     {
         $html  = '';
-        $html .= "<footer class='sponsors footer bg-white'>";
+        $html .= "<footer class='sponsors footer'>";
         $html .= "<div class='container'>";
         $html .= "<h5>Sponsored by</h5>";
         $html .= "<div class='sponsor-list container align-items-center'>";
@@ -148,7 +159,7 @@ class pluginSponsors extends Plugin
         $sponsors = json_decode($jsondb);
 
         foreach ($sponsors as $sponsor) {
-            $html .= $this->sponsorAsHtml($sponsor);
+            $html .= $this->sponsorLogoAsHtml($sponsor);
         }
 
         $html .= "</ul>";
@@ -168,6 +179,24 @@ class pluginSponsors extends Plugin
         $elem .= $sponsor->name;
         $elem .= '</a>';
         $elem .= ' ' . $sponsor->suffix;
+        $elem .= '</li>';
+
+        return $elem;
+    }
+
+    public function sponsorLogoAsHtml($sponsor)
+    {
+        $fullname = $sponsor->prefix . ' ' . $sponsor->name . ' ' . $sponsor->suffix;
+
+        $elem  = '';
+        $elem .= '<li class="sponsor">';
+        $elem .= '<a href="' . $sponsor->url . '" target="_blank">';
+        $elem .= '<img class="logo" ';
+        $elem .= ' src="'   . $sponsor->logourl . '"';
+        $elem .= ' title="' . $fullname . '"';
+        $elem .= ' alt="'   . $fullname . '"';
+        $elem .= '/>';
+        $elem .= '</a>';
         $elem .= '</li>';
 
         return $elem;
