@@ -159,7 +159,7 @@ class pluginSponsors extends Plugin
         $sponsors = json_decode($jsondb);
 
         foreach ($sponsors as $sponsor) {
-            $html .= $this->sponsorLogoAsHtml($sponsor);
+            $html .= empty($sponsor->logourl) ? $this->sponsorAsHtml($sponsor) : $this->sponsorLogoAsHtml($sponsor);
         }
 
         $html .= "</ul>";
