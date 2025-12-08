@@ -151,7 +151,7 @@ class pluginSponsors extends Plugin
         $html  = '';
         $html .= "<footer class='sponsors footer'>";
         $html .= "<div class='container'>";
-        $html .= "<h5>Sponsored by</h5>";
+        $html .= "<h5>With friendly support from</h5>";
         $html .= "<div class='sponsor-list'>";
         $html .= "<ul class='list-unstyled'>";
 
